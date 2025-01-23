@@ -2,6 +2,7 @@ import colorsys
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def rgb_to_hsl(r, g, b):
     """Convert RGB to HSL."""
     return colorsys.rgb_to_hls(r / 255.0, g / 255.0, b / 255.0)
@@ -170,7 +171,7 @@ def convert_to_8bit(image):
 
 
 
-def create_panel(image, luts, channel_names, composite_image):
+def create_panel(image, luts, channel_names, composite_image, scale_length=50, pixel_size=1):
     """
     Create a tiled panel image where each channel is displayed as a grayscale image
     with the channel name written in the corresponding LUT color. The last panel
@@ -229,9 +230,31 @@ def create_panel(image, luts, channel_names, composite_image):
         bbox=dict(facecolor='black', alpha=0.5, edgecolor='none')
     )
 
+    # Add scale bar to composite image with black overlay box
+    scale_bar_length = scale_length / pixel_size  # Length in pixels
+    axes[num_channels].add_patch(plt.Rectangle(
+        (composite_image.shape[1] - scale_bar_length - 15, 5), scale_bar_length + 10, 20,
+        color='black', alpha=0.7, transform=axes[num_channels].transData, clip_on=False
+    ))
+    axes[num_channels].plot(
+        [composite_image.shape[1] - scale_bar_length - 10, composite_image.shape[1] - 10],
+        [10, 10], color='white', lw=3, transform=axes[num_channels].transData, clip_on=False
+    )
+    axes[num_channels].text(
+        composite_image.shape[1] - scale_bar_length / 2 - 10, 20, f'{scale_length} µm',
+        color='white', fontsize=10, ha='center', va='bottom',
+        transform=axes[num_channels].transData
+    )
+
+
     # Hide any unused axes
     for j in range(num_channels + 1, len(axes)):
         axes[j].axis('off')
+        # Add the scale bar
+
+
+
+
 
     # Adjust layout and show the panel
     plt.tight_layout()
