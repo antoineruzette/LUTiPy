@@ -171,7 +171,7 @@ def convert_to_8bit(image):
 
 
 
-def create_panel(image, luts, channel_names, composite_image, scale_length=50, pixel_size=1):
+def create_panel(image, luts, channel_names, composite_image, scale_length=0.1, pixel_size="10 nm", layout='grid'):
     """
     Create a tiled panel image where each channel is displayed as a grayscale image
     with the channel name written in the corresponding LUT color. The last panel
@@ -194,9 +194,14 @@ def create_panel(image, luts, channel_names, composite_image, scale_length=50, p
 
     num_channels = image.shape[-1]
 
-    # Determine grid size for tiling
-    grid_cols = int(np.ceil(np.sqrt(num_channels + 1)))
-    grid_rows = int(np.ceil((num_channels + 1) / grid_cols))
+    if layout == 'grid':
+        # Determine grid size for tiling
+        grid_cols = int(np.ceil(np.sqrt(num_channels + 1)))
+        grid_rows = int(np.ceil((num_channels + 1) / grid_cols))
+    
+    elif layout == 'horizontal':
+        grid_cols = num_channels + 1
+        grid_rows = 1
 
     # Create a figure for the tiled panel
     fig, axes = plt.subplots(grid_rows, grid_cols, figsize=(5 * grid_cols, 5 * grid_rows))
@@ -231,7 +236,8 @@ def create_panel(image, luts, channel_names, composite_image, scale_length=50, p
     )
 
     # Add scale bar to composite image with black overlay box
-    scale_bar_length = scale_length / pixel_size  # Length in pixels
+    scale_bar_length = image.shape[1]*scale_length  # Length in micrometers
+    scale_value = scale_bar_length*(int(pixel_size.split(" ")[0]))
     axes[num_channels].add_patch(plt.Rectangle(
         (composite_image.shape[1] - scale_bar_length - 15, 5), scale_bar_length + 10, 20,
         color='black', alpha=0.7, transform=axes[num_channels].transData, clip_on=False
@@ -241,7 +247,7 @@ def create_panel(image, luts, channel_names, composite_image, scale_length=50, p
         [10, 10], color='white', lw=3, transform=axes[num_channels].transData, clip_on=False
     )
     axes[num_channels].text(
-        composite_image.shape[1] - scale_bar_length / 2 - 10, 20, f'{scale_length} µm',
+        composite_image.shape[1] - scale_bar_length / 2 - 10, 20, f'{scale_value} {pixel_size.split(" ")[1]}',
         color='white', fontsize=10, ha='center', va='bottom',
         transform=axes[num_channels].transData
     )
@@ -261,7 +267,24 @@ def create_panel(image, luts, channel_names, composite_image, scale_length=50, p
     plt.show()
 
 
-def lutipy(image, rgb=(255,0,255), channel_names=None):
+
+def image_resize(image, new_size):
+    """
+    Resize an image to a new size.
+
+    Args:
+        image (numpy.ndarray): Input image.
+        new_size (tuple): New size (height, width).
+
+    Returns:
+        numpy.ndarray: Resized image.
+    """
+    resized_image = np.zeros_like(image, dtype=image.dtype)
+    for i in range(image.shape[-1]):
+        resized_image[:, :, i] = image[:, :, i].resize(new_size)
+    return resized_image
+
+def lutipy(image, rgb=(255,0,255), channel_names=None, layout='grid', scale_length=0.1, pixel_size="10 nm"):
     image_8bit = convert_to_8bit(image)
     num_channels = image_8bit.shape[-1]
     luts = find_n_complementary_colors(rgb=rgb, n=num_channels)
@@ -270,4 +293,4 @@ def lutipy(image, rgb=(255,0,255), channel_names=None):
     if channel_names is None:
         channel_names = [f"Channel {i+1}" for i in range(num_channels)]
 
-    create_panel(image_8bit, luts, channel_names, image_lut, )
+    create_panel(image_8bit, luts, channel_names, image_lut, layout=layout, scale_length=scale_length, pixel_size=pixel_size)
