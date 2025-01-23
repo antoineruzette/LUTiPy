@@ -12,5 +12,6 @@ from lutipy.core import lutipy
 
 image = tiff.imread("example.tiff")
 lutipy(image)
+```
 
 !![Example Image](assets/example_1.png)
