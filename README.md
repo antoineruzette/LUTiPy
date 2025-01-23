@@ -15,4 +15,4 @@ lutipy(image)
 ```
 
 <!-- ![Example Image](assets/example_1.png) -->
-<img src="assets/example_1.png" width="300" />
+<img src="assets/example_1.png" width="600" />
