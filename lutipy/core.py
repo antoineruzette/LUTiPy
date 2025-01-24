@@ -32,8 +32,15 @@ class LUTiPy:
         Returns:
             None
         """
+
+        """
+        TODO:
+        1. Check the scale and modify wrt image resizing, otherwise it is incorrect.
+        """
         image_8bit = ImageProcessor.convert_to_8bit(image)
-        image_8bit = ImageProcessor.resize_image(image_8bit, (200,200))
+        aspect_ratio = image_8bit.shape[1] / image_8bit.shape[0]
+        image_8bit = ImageProcessor.resize_image(image_8bit, (400,int(400*aspect_ratio)))
+        print(aspect_ratio, image_8bit.shape)
         num_channels = image_8bit.shape[-1]
         complementary_colors = ComplementaryColors(self.rgb).find_n_complementary_colors(num_channels)
         composite_image = ImageProcessor.apply_complementary_luts(image_8bit, complementary_colors)

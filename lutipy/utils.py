@@ -195,6 +195,7 @@ class PanelCreator:
         if len(luts) != image.shape[-1] or len(channel_names) != image.shape[-1]:
             raise ValueError("Number of LUTs and channel names must match the number of channels in the image.")
 
+        print(image.shape)
         num_channels = image.shape[-1]
         # Determine grid size for tiling
         if layout == 'grid':
@@ -203,9 +204,27 @@ class PanelCreator:
         if layout == 'horizontal':
             grid_cols = num_channels + 1
             grid_rows = 1
+        if layout == 'vertical':
+            grid_cols = 1
+            grid_rows = num_channels + 1
 
-        # Create a figure for the tiled panel
-        fig, axes = plt.subplots(grid_rows, grid_cols, figsize=(5 * grid_cols, 5 * grid_rows))
+        # # Create a figure for the tiled panel
+        # fig, axes = plt.subplots(grid_rows, grid_cols, figsize=(5 * grid_cols, 5 * grid_rows))
+        # axes = axes.flatten()
+
+        # Create a figure for the tiled panel with dynamic figsize
+        if image.shape[0] / image.shape[1] >= 1:
+            fig_width = 5 * grid_cols
+            fig_height = 5 * grid_rows * (image.shape[0] / image.shape[1])  # Adjust height based on image aspect ratio
+        
+        if image.shape[0] / image.shape[1] < 1:
+            fig_width = 5 * grid_cols * (image.shape[1] / image.shape[0])  # Adjust width based on image aspect ratio
+            fig_height = 5 * grid_rows
+
+        
+
+        fig, axes = plt.subplots(grid_rows, grid_cols, figsize=(fig_width, fig_height), constrained_layout=True)
+
         axes = axes.flatten()
 
         for i in range(num_channels):
