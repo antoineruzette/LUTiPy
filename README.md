@@ -1,4 +1,4 @@
-# LUTiPy
+# Lookup Table in Python (LUTiPy)
 LUTiPy is a Python package for creating aesthetically pleasing composite images from fluorescent microscopy data using complementary LUTs.
 
 ## Features
