@@ -1,4 +1,5 @@
 import numpy as np
+from matplotlib import pyplot as plt
 from lutipy.utils import ImageProcessor, ComplementaryColors, PanelCreator
 
 
@@ -7,7 +8,8 @@ from lutipy.utils import ImageProcessor, ComplementaryColors, PanelCreator
 class LUTiPy:
     """Main interface for processing and visualizing images using LUTs."""
 
-    def __init__(self, rgb: tuple = (255, 0, 255), channel_names: list = None, layout: str = 'grid', scale_length: float = 0.1, pixel_size: str = "10 nm"):
+    def __init__(self, rgb: tuple = (255, 0, 255), channel_names: list = None, layout: str = 'grid', scale_length: float = 0.1, pixel_size: str = "10 nm", name_position="top-left", show_box_background=True,
+                 scalebar=True, scalebar_position="bottom-left"):
         """Initialize the LUTIPy object.
 
         Args:
@@ -22,6 +24,10 @@ class LUTiPy:
         self.layout = layout
         self.scale_length = scale_length
         self.pixel_size = pixel_size
+        self.name_position = name_position
+        self.show_box_background = show_box_background
+        self.scalebar = scalebar
+        self.scalebar_position = scalebar_position
 
     def process_image(self, image: np.ndarray) -> None:
         """Process the image and create a panel visualization.
@@ -48,7 +54,24 @@ class LUTiPy:
         if self.channel_names is None:
             self.channel_names = [f"Channel {i + 1}" for i in range(num_channels)]
 
-        PanelCreator.create_panel(
-            image_8bit, complementary_colors, self.channel_names, composite_image,
-            layout=self.layout, scale_length=self.scale_length, pixel_size=self.pixel_size
+        # Create panel and store the figure
+        self._figure = PanelCreator.create_panel(
+            image_8bit, complementary_colors, self.channel_names,
+            ImageProcessor.apply_complementary_luts(image_8bit, complementary_colors),
+            layout=self.layout, scale_length=self.scale_length, pixel_size=self.pixel_size, 
+            name_position = self.name_position,
+            show_box_background = self.show_box_background,
+            scalebar=self.scalebar, scalebar_position=self.scalebar_position
         )
+
+    def save_figure(self, filename: str) -> None:
+        """Save the generated figure to a file.
+
+        Args:
+            filename (str): Path where the figure will be saved.
+        """
+        if self._figure is None:
+            raise ValueError("No figure has been generated yet. Please call process_image() first.")
+        
+        self._figure.savefig(filename, dpi=300, bbox_inches='tight')
+        print(f"Figure saved as {filename}.")
