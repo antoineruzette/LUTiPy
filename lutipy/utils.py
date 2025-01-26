@@ -495,7 +495,7 @@ class PanelCreator:
         luts: list,
         channel_names: list,
         composite_image: np.ndarray,
-        scale_length: float = 0.1,
+        scale_length: float = 0.25,
         pixel_size: float = None,  # Pixel size in physical units, required for scalebar
         layout: str = 'grid',
         name_position: str = 'bottom-center',
