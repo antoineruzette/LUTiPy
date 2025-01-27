@@ -628,7 +628,7 @@ class PanelCreator:
     def _add_scalebar(axis, scale_length: float, pixel_size: float, text_position: dict, image_shape: tuple, show_box_background: bool):
         """Add a scalebar to the image."""
         scale_bar_length_px = int(image_shape[1] * scale_length)
-        scale_bar_length_physical = scale_bar_length_px * float(pixel_size.split(" ")[0])  # Physical length
+        scale_bar_length_physical = scale_length * float(pixel_size.split(" ")[0])  # Physical length
 
         # Calculate dynamic starting positions based on text_position
         x_start = text_position['x'] - (scale_bar_length_px / (2 * image_shape[1])) if text_position['ha'] == 'center' else (

@@ -8,8 +8,8 @@ from lutipy.utils import ImageProcessor, ComplementaryColors, PanelCreator
 class LUTiPy:
     """Main interface for processing and visualizing images using LUTs."""
 
-    def __init__(self, rgb: tuple = (255, 0, 255), channel_names: list = None, layout: str = 'grid', scale_length: float = 0.1, pixel_size: str = "10 nm", name_position="top-left", show_box_background=True,
-                 scalebar=True, scalebar_position="bottom-left"):
+    def __init__(self, rgb: tuple = (255, 0, 255), channel_names: list = None, layout: str = 'grid', scale_length: float = 0.25, pixel_size: str = "10 nm", name_position="top-left", show_box_background=True,
+                 scalebar=False, scalebar_position="bottom-left"):
         """Initialize the LUTIPy object.
 
         Args:
@@ -29,6 +29,22 @@ class LUTiPy:
         self.scalebar = scalebar
         self.scalebar_position = scalebar_position
 
+    def _convert_pixel_size(self, image: np.ndarray, pixel_size: str) -> float:
+        """Convert pixel size to a float value in meters."""
+        try:
+            value, unit = pixel_size.split()
+            value = float(value)
+            unit = unit.lower()
+
+        except ValueError as e:
+            raise ValueError(f"Invalid pixel size format: {pixel_size}") from e
+        
+        value = float(value)*image.shape[1]
+
+        return f"{value} {unit}"
+        
+
+
     def process_image(self, image: np.ndarray) -> None:
         """Process the image and create a panel visualization.
 
@@ -45,6 +61,7 @@ class LUTiPy:
         """
         image = ImageProcessor.convert_to_channel_last(image)
         image_8bit = ImageProcessor.convert_to_8bit(image)
+        pixel_size = self._convert_pixel_size(image_8bit, self.pixel_size)
         aspect_ratio = image_8bit.shape[1] / image_8bit.shape[0]
         image_8bit = ImageProcessor.resize_image(image_8bit, (400,int(400*aspect_ratio)))
         num_channels = image_8bit.shape[-1]
@@ -58,7 +75,7 @@ class LUTiPy:
         self._figure = PanelCreator.create_panel(
             image_8bit, complementary_colors, self.channel_names,
             ImageProcessor.apply_complementary_luts(image_8bit, complementary_colors),
-            layout=self.layout, scale_length=self.scale_length, pixel_size=self.pixel_size, 
+            layout=self.layout, scale_length=self.scale_length, pixel_size=pixel_size, 
             name_position = self.name_position,
             show_box_background = self.show_box_background,
             scalebar=self.scalebar, scalebar_position=self.scalebar_position

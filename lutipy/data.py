@@ -2,12 +2,11 @@ import numpy as np
 
 def cells():
     """
-    Sample image of cells. Channel 1: DAPI, Channel 2: GFP.
-    Dimensions: 512x512 pixels.
+    Sample image of cells.
+    Shape: 1392x1040x2 pixels.
+    Channel 1: Phalloidin, Channel 2: DAPI.
 
-    TODO:
-    1. Add more image details
-    2. Provide image acknowledgement
+    Reference: http://cellimagelibrary.org/images/CCDB_6843
     """
     try:
         from imageio.v2 import volread
@@ -24,12 +23,11 @@ def cells():
 
 def nori():
     """
-    Sample image of cells. Channel 1: Protein, Channel 2: Lipid, Channel 3: Endomucin.
+    Sample image of cells.
     Dimensions: 1024x1024 pixels.
+    Channel 1: Protein, Channel 2: Lipid, Channel 3: Endomucin.
 
-    TODO:
-    1. Add more image details
-    2. Provide image acknowledgement
+    Reference: https://pubmed.ncbi.nlm.nih.gov/35452314/
     """
     try:
         from imageio.v2 import volread
