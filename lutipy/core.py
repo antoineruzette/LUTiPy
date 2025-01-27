@@ -8,7 +8,7 @@ from lutipy.utils import ImageProcessor, ComplementaryColors, PanelCreator
 class LUTiPy:
     """Main interface for processing and visualizing images using LUTs."""
 
-    def __init__(self, rgb: tuple = (255, 0, 255), channel_names: list = None, layout: str = 'grid', scale_length: float = 0.25, pixel_size: str = "10 nm", name_position="top-left", show_box_background=True,
+    def __init__(self, rgb: tuple = (255, 0, 255), channel_names: list = None, layout: str = 'grid', scale_length: float = 0.25, pixel_size: str = None, name_position="top-left", show_box_background=True,
                  scalebar=False, scalebar_position="bottom-left"):
         """Initialize the LUTIPy object.
 
