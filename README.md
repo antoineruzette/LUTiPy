@@ -19,7 +19,7 @@ lutipy = LUTiPy(layout="horizontal",
 lutipy.process_image(image)
 ```
 
-<img src="assets/out.png" width="600" />
+<img src="assets/out.png"/>
 
 To save the frame:
 
