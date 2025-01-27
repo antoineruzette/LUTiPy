@@ -7,17 +7,22 @@ LUTiPy is a Python package for creating aesthetically pleasing composite images 
 
 ## Usage
 ```python
-import tifffile as tiff
-from lutipy.core import LUTiPy, ImageProcessor
+from lutipy.core import LUTiPy
+import lutipy.data as data
 
+image = data.cells()
 
+# Create a LUTiPy object
+lutipy = LUTiPy(layout="horizontal", 
+                scalebar=True, pixel_size="0.31 nm", scale_length=0.25)
 
-image = tiff.imread(f"assets/cells_1.tif")
-image = ImageProcessor.convert_to_channel_last(image)
-
-lutipy = LUTiPy(channel_names=["Protein", "Lipid"], layout="horizontal")
 lutipy.process_image(image)
 ```
 
-<!-- ![Example Image](assets/example_1.png) -->
-<img src="assets/example_1.png" width="600" />
+<img src="assets/out.png" width="600" />
+
+To save the frame:
+
+```python
+lutipy.save_figure("out.png")
+```
