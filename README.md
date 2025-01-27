@@ -86,13 +86,21 @@ show_box_background=True,
 **Parameters:**
 
 ```rgb (tuple)```: Custom color for the first channel. *Default: magenta (255, 0, 255)*
+
 ```layout (str)```: Specifies the arrangement of images. ```horizontal```, ```vertical``` & ```grid```.
+
 ```channel_names (list)```: Channel names mentioned on the image. *Default: None - adds names as Channel 1, Channel 2, ...*
+
 ```scalebar (bool)```: Determines whether to include a scalebar in the image. *Default: False*
+
 ```scale_length (float)```: Percentage of the image with scalebar length (between 0.1-0.9). *Default: 0.25*
+
 ```pixel_size (str)```: Pixel size in the form of a string {value} {unit}. *Default: None*
+
 ```scalebar_position (str)```: Position of the scalebar on the frame. *Default: "bottom-left"*
+
 ```name_position (str)```: Position of the channel name on the frame. *Default: "top-left"*
+
 ```show_box_background (bool)```: Add black background with 50% transparency to the name and scalebar box. *Default: True*
 
 
