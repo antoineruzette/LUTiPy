@@ -496,12 +496,14 @@ class PanelCreator:
         channel_names: list,
         composite_image: np.ndarray,
         scale_length: float = 0.25,
-        pixel_size: float = None,  # Pixel size in physical units, required for scalebar
+        pixel_size: str = None,  # Pixel size in physical units, required for scalebar
         layout: str = 'grid',
         name_position: str = 'bottom-center',
         show_box_background: bool = True,
         scalebar: bool = False,  # Whether to add a scalebar
-        scalebar_position: str = 'bottom-right'  # Position of the scalebar
+        scalebar_position: str = 'bottom-right',  # Position of the scalebar
+        in_physical_units: bool = False,  # Whether scale_length is in physical units
+        resize_factor: float = 1.0  # Factor by which the image was resized
     ) -> plt.Figure:
         """
         Create a tiled panel image with user-defined name positioning and optional scalebar.
@@ -511,13 +513,15 @@ class PanelCreator:
             luts (list): List of LUT colors (RGB tuples).
             channel_names (list): Names for each channel.
             composite_image (np.ndarray): Composite RGB image.
-            scale_length (float): Length of the scalebar as a fraction of the image width.
-            pixel_size (float): Physical size of a pixel (e.g., 0.1 micrometers). Required if scalebar is True.
+            scale_length (float): Length of the scalebar. If in_physical_units is False, this is a fraction of image width.
+                                If in_physical_units is True, this is the physical length in the same units as pixel_size.
+            pixel_size (str): Physical size of a pixel (e.g., "0.31 nm"). Required if scalebar is True.
             layout (str): Layout of the panel ('grid', 'horizontal', 'vertical').
             name_position (str): Position of channel names ('bottom-center', 'top-left', etc.).
             show_box_background (bool): Whether to show a black background behind names.
             scalebar (bool): Whether to add a scalebar.
             scalebar_position (str): Position of the scalebar ('bottom-right', 'top-left', etc.).
+            in_physical_units (bool): If True, scale_length is interpreted as physical length. If False, it's a fraction of image width.
 
         Returns:
             plt.Figure: The figure object for the created panel.
@@ -553,7 +557,7 @@ class PanelCreator:
         if scalebar:
             if pixel_size is None:
                 raise ValueError("Pixel size must be provided for scalebar.")
-            PanelCreator._add_scalebar(axes[num_channels], scale_length, pixel_size, scalebar_text_position, image.shape, show_box_background)
+            PanelCreator._add_scalebar(axes[num_channels], scale_length, pixel_size, scalebar_text_position, image.shape, show_box_background, in_physical_units, resize_factor)
 
         # Hide any unused axes
         for j in range(num_channels + 1, len(axes)):
@@ -625,10 +629,23 @@ class PanelCreator:
         )
 
     @staticmethod
-    def _add_scalebar(axis, scale_length: float, pixel_size: float, text_position: dict, image_shape: tuple, show_box_background: bool):
+    def _add_scalebar(axis, scale_length: float, pixel_size: str, text_position: dict, image_shape: tuple, show_box_background: bool, in_physical_units: bool = False, resize_factor: float = 1.0):
         """Add a scalebar to the image."""
-        scale_bar_length_px = int(image_shape[1] * scale_length)
-        scale_bar_length_physical = scale_length * float(pixel_size.split(" ")[0])  # Physical length
+        # Calculate scale bar length in pixels
+        if in_physical_units:
+            # Convert physical length to pixels, accounting for image resize to 400x400
+            pixel_size_value = float(pixel_size.split(" ")[0])
+            scale_bar_length_px = int((scale_length / pixel_size_value) * resize_factor)
+            scale_bar_length_physical = scale_length
+        else:
+            # Use fraction of image width
+            scale_bar_length_px = int(image_shape[1] * scale_length)
+            # For fraction case, calculate physical length from pixel size and total width
+            # IMportant note: image_shape is already the resized image shape
+            pixel_size_value = float(pixel_size.split(" ")[0])
+            # total width in physical units for the resized image
+            total_width = (image_shape[1] / resize_factor) * pixel_size_value
+            scale_bar_length_physical = total_width * scale_length
 
         # Calculate dynamic starting positions based on text_position
         x_start = text_position['x'] - (scale_bar_length_px / (2 * image_shape[1])) if text_position['ha'] == 'center' else (
@@ -651,7 +668,6 @@ class PanelCreator:
                     color='black', alpha=0.5, transform=axis.transAxes, clip_on=False
                 )
             )
-
 
         axis.plot(
             [x_start, x_end], [y_start, y_start], color='white', lw=3,

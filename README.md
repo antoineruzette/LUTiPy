@@ -103,6 +103,8 @@ show_box_background=True,
 
 ```show_box_background (bool)```: Add black background with 50% transparency to the name and scalebar box. *Default: True*
 
+```in_physical_units (bool)```: If True, scale_length is interpreted as physical length in the same units as pixel_size. If False, scale_length is a fraction of image width. *Default: False*
+
 
 ### 2. Process Image
 Pass a single image or a list of images to be processed:
